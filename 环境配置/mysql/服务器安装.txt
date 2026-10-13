@@ -1,0 +1,36 @@
+windows mysq服务安装
+
+https://dev.mysql.com/downloads/installer/
+下载mysql服务安装包
+
+跟随安装引导执行
+
+选择安装类型：在安装向导中，你可以根据需要选择：
+Developer Default：适合开发者，会同时安装 MySQL Server、Workbench 等常用工具。
+Server only：如果你只需要数据库服务器本身，选这个最干净。
+
+配置服务器：安装完文件后，会自动进入配置向导（MySQL Configurator）。这一步很关键：
+端口：默认 3306 即可，如果被占用可以改为 3307。
+密码：为 root 用户设置一个强密码，务必牢记，这是登录数据库的凭证。
+服务：建议勾选 “Start the MySQL Server at System Startup”，这样开机就会自动启动服务，省去手动操作的麻烦。
+
+完成安装：点击 Execute 执行配置，等全部项目显示绿勾后，点击 Finish 完成。
+
+安装完成后，按 Win + R 输入 cmd 打开命令提示符，输入以下命令验证：
+mysql -u root -p
+回车后输入你刚才设置的密码，如果能看到 mysql> 提示符，就说明安装和登录都成功了
+
+
+
+
+
+安装完成后，如何验证服务已经启动成功，可以正常连接使用？
+
+MySQL 安装后通常会注册为 Windows 服务。以管理员身份打开命令提示符，输入以下命令：
+sc query mysql
+如果看到 STATE : 4 RUNNING，说明服务已成功启动。如果状态不是 RUNNING，可以尝试用 net start mysql 手动启动。
+
+这是最直接的验证方式。在命令提示符中输入：
+mysql -u root -p
+按回车后，系统会提示 Enter password:。输入你在安装时设置的 root 密码
+

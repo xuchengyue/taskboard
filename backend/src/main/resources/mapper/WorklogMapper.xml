@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agile.taskboard.mapper.WorklogMapper">
+
+    <select id="selectWorklogPage" resultType="com.agile.taskboard.vo.WorklogVO">
+        SELECT
+            w.id, w.task_id, t.title AS task_title, w.project_id, p.name AS project_name,
+            w.user_id, u.real_name AS user_name, w.work_date, w.hours, w.description,
+            w.status, w.auditor_id, au.real_name AS auditor_name, w.audit_remark, w.audit_time, w.create_time
+        FROM t_worklog w
+        LEFT JOIN t_task t ON w.task_id = t.id
+        LEFT JOIN project p ON w.project_id = p.id
+        LEFT JOIN sys_user u ON w.user_id = u.id
+        LEFT JOIN sys_user au ON w.auditor_id = au.id
+        <where>
+            <if test="projectId != null">AND w.project_id = #{projectId}</if>
+            <if test="userId != null">AND w.user_id = #{userId}</if>
+            <if test="status != null">AND w.status = #{status}</if>
+        </where>
+        ORDER BY w.work_date DESC, w.id DESC
+    </select>
+
+    <select id="selectMemberStats" resultType="com.agile.taskboard.vo.MemberStatVO">
+        SELECT
+            w.user_id AS userId,
+            u.real_name AS memberName,
+            SUM(w.hours) AS totalHours,
+            COUNT(DISTINCT w.task_id) AS taskCount
+        FROM t_worklog w
+        LEFT JOIN sys_user u ON w.user_id = u.id
+        WHERE w.status = 1
+        <if test="projectId != null">AND w.project_id = #{projectId}</if>
+        <if test="startDate != null">AND w.work_date &gt;= #{startDate}</if>
+        <if test="endDate != null">AND w.work_date &lt;= #{endDate}</if>
+        GROUP BY w.user_id, u.real_name
+        ORDER BY totalHours DESC
+    </select>
+
+    <select id="selectDailyTrend" resultType="java.util.Map">
+        SELECT
+            w.work_date AS workDate,
+            SUM(w.hours) AS totalHours
+        FROM t_worklog w
+        WHERE w.status = 1
+        <if test="projectId != null">AND w.project_id = #{projectId}</if>
+        <if test="startDate != null">AND w.work_date &gt;= #{startDate}</if>
+        <if test="endDate != null">AND w.work_date &lt;= #{endDate}</if>
+        GROUP BY w.work_date
+        ORDER BY w.work_date ASC
+    </select>
+
+</mapper>

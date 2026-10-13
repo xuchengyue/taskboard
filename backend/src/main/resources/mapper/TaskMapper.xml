@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agile.taskboard.mapper.TaskMapper">
+
+    <select id="selectBoardTasks" resultType="com.agile.taskboard.vo.TaskVO">
+        SELECT
+            t.id, t.project_id, t.title, t.description, t.status, t.priority,
+            t.assignee_id, u.real_name AS assignee_name, t.creator_id,
+            t.estimated_hours, t.actual_hours, t.due_date, t.sort_order, t.create_time
+        FROM t_task t
+        LEFT JOIN sys_user u ON t.assignee_id = u.id
+        WHERE t.deleted = 0 AND t.project_id = #{projectId}
+        ORDER BY t.status, t.sort_order ASC, t.id ASC
+    </select>
+
+    <update id="addActualHours">
+        UPDATE t_task SET actual_hours = actual_hours + #{hours} WHERE id = #{taskId}
+    </update>
+
+</mapper>
